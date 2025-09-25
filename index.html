@@ -730,6 +730,12 @@
                 }
             }
 
+            // Handle special naming patterns
+            if (spectrogramPath.includes('/FINALLY_16k/')) {
+                // FINALLY files: 0015b_input.wav -> 0015.png
+                spectrogramPath = spectrogramPath.replace(/(\d+)b_input\.png$/, '$1.png');
+            }
+
             return spectrogramPath;
         }
 
