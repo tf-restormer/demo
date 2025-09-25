@@ -261,24 +261,28 @@
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="card">
                             <h4 class="text-center">Input (Noisy)</h4>
+                            <img id="universe-input-spec" src="spectrograms/tab1_UNIVERSE/input/0015b_input.png" alt="Input Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
                             <audio id="universe-input" controls style="width: 100%;">
                                 <source src="samples/universe/input/0015b_input.wav">
                             </audio>
                         </div>
                         <div class="card">
                             <h4 class="text-center">TF-Restormer (Ours)</h4>
+                            <img id="universe-ours-spec" src="spectrograms/tab1_UNIVERSE/ours_TF_Restormer/0015b_input.png" alt="TF-Restormer Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
                             <audio id="universe-ours" controls style="width: 100%;">
                                 <source src="samples/universe/ours_TF_Restormer/0015b_input_enhanced.wav">
                             </audio>
                         </div>
                         <div class="card">
                             <h4 class="text-center">TF-Restormer Streaming (Ours)</h4>
+                            <img id="universe-streaming-spec" src="spectrograms/tab1_UNIVERSE/ours_TF_Restormer_streaming/0015b_input.png" alt="TF-Restormer Streaming Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
                             <audio id="universe-streaming" controls style="width: 100%;">
                                 <source src="samples/universe/ours_TF_Restormer_streaming/0015b_input_enhanced.wav">
                             </audio>
                         </div>
                         <div class="card">
                             <h4 class="text-center">Ground Truth (Clean)</h4>
+                            <img id="universe-clean-spec" src="spectrograms/tab1_UNIVERSE/clean/0015d_target.png" alt="Clean Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
                             <audio id="universe-clean" controls style="width: 100%;">
                                 <source src="samples/universe/clean/0015d_target.wav">
                             </audio>
@@ -348,24 +352,28 @@
                     <div class="grid grid-cols-2 gap-4 mb-4">
                         <div class="card">
                             <h4 class="text-center">Input (Degraded)</h4>
+                            <img id="vctk-input-spec" src="spectrograms/tab2_VCTK_DEMAND/input_16k/p232_010.png" alt="Input Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
                             <audio id="vctk-input" controls style="width: 100%;">
                                 <source src="samples/vctk_demand/input_16k/p232_010.wav">
                             </audio>
                         </div>
                         <div class="card">
                             <h4 class="text-center">TF-Restormer (Ours)</h4>
+                            <img id="vctk-ours-spec" src="spectrograms/tab2_VCTK_DEMAND/our_TF_Restormer/p232_010.png" alt="TF-Restormer Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
                             <audio id="vctk-ours" controls style="width: 100%;">
                                 <source src="samples/vctk_demand/our_TF_Restormer/p232_010.wav">
                             </audio>
                         </div>
                         <div class="card">
                             <h4 class="text-center">TF-Restormer Streaming (Ours)</h4>
+                            <img id="vctk-streaming-spec" src="spectrograms/tab2_VCTK_DEMAND/our_TF_Restormer_streaming/p232_010.png" alt="TF-Restormer Streaming Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
                             <audio id="vctk-streaming" controls style="width: 100%;">
                                 <source src="samples/vctk_demand/our_TF_Restormer_streaming/p232_010.wav">
                             </audio>
                         </div>
                         <div class="card">
                             <h4 class="text-center">Ground Truth (Clean)</h4>
+                            <img id="vctk-clean-spec" src="spectrograms/tab2_VCTK_DEMAND/clean_16k/p232_010.png" alt="Clean Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
                             <audio id="vctk-clean" controls style="width: 100%;">
                                 <source src="samples/vctk_demand/clean_16k/p232_010.wav">
                             </audio>
@@ -824,6 +832,16 @@
         function updateUniverseSample() {
             const sample = document.getElementById('universe-sample-select').value;
 
+            // Update spectrograms
+            document.getElementById('universe-input-spec').src =
+                `spectrograms/tab1_UNIVERSE/input/${sample}b_input.png`;
+            document.getElementById('universe-ours-spec').src =
+                `spectrograms/tab1_UNIVERSE/ours_TF_Restormer/${sample}b_input.png`;
+            document.getElementById('universe-streaming-spec').src =
+                `spectrograms/tab1_UNIVERSE/ours_TF_Restormer_streaming/${sample}b_input.png`;
+            document.getElementById('universe-clean-spec').src =
+                `spectrograms/tab1_UNIVERSE/clean/${sample}d_target.png`;
+
             // Update main comparison audios
             document.getElementById('universe-input').innerHTML =
                 `<source src="samples/universe/input/${sample}b_input.wav">`;
@@ -855,6 +873,16 @@
         // VCTK-DEMAND functions (simplified)
         function updateVCTKSample() {
             const sample = document.getElementById('vctk-sample-select').value;
+
+            // Update spectrograms
+            document.getElementById('vctk-input-spec').src =
+                `spectrograms/tab2_VCTK_DEMAND/input_16k/${sample}.png`;
+            document.getElementById('vctk-ours-spec').src =
+                `spectrograms/tab2_VCTK_DEMAND/our_TF_Restormer/${sample}.png`;
+            document.getElementById('vctk-streaming-spec').src =
+                `spectrograms/tab2_VCTK_DEMAND/our_TF_Restormer_streaming/${sample}.png`;
+            document.getElementById('vctk-clean-spec').src =
+                `spectrograms/tab2_VCTK_DEMAND/clean_16k/${sample}.png`;
 
             document.getElementById('vctk-input').innerHTML =
                 `<source src="samples/vctk_demand/input_16k/${sample}.wav">`;
