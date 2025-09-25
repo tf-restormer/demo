@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TF-Restormer: Time-Frequency Domain Transformer for Speech Enhancement</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Time-Frequency Domain Transformer for Speech Enhancement - Efficient speech enhancement using self-attention mechanisms and complex spectral mapping">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/seed-blue.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- KaTeX for LaTeX Math Rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+</head>
+
+<body data-theme="light">
+    <!-- Header with Navigation -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="nav">
+                    <a href="#" class="nav-link">Home</a>
+                    <a href="#architecture" class="nav-link">Abstract & Architecture</a>
+                    <a href="#demo" class="nav-link">Audio Samples</a>
+                    <a href="#comparison" class="nav-link">Results</a>
+                </div>
+                <div class="theme-toggle" id="themeToggle">
+                    <div class="theme-toggle-slider">
+                        <span class="theme-icon" id="themeIcon">☀️</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-badges">
+                <span class="badge">Speech Enhancement</span>
+                <span class="badge">Real-time Streaming</span>
+                <span class="badge">Open Source</span>
+            </div>
+            <h1 class="hero-title">TF-Restormer</h1>
+            <p class="hero-subtitle">
+                Complex Spectral Prediction for Speech Restoration
+            </p>
+            <div class="hero-buttons">
+                <a href="#" class="btn btn-primary">
+                    <i class="fas fa-file-pdf"></i> Read Paper
+                </a>
+                <a href="https://anonymous.4open.science/r/TF_Restormer-8440" class="btn btn-secondary" target="_blank">
+                    <img src="https://repository-images.githubusercontent.com/49929867/6a4aaf80-a7ff-11ea-82a8-dcf49e83d366" style="width: 16px; height: 16px; margin-right: 8px; vertical-align: middle;" alt="GitHub"> View Code
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Section (with Abstract) -->
+    <section id="architecture" class="section">
+        <div class="container">
+            <!-- Abstract Card -->
+            <div class="card fade-in mb-4">
+                <h2 class="card-title text-center">Abstract</h2>
+                <div class="card-description">
+                    <p style="text-align: justify;">
+                        Speech restoration in real-world conditions is challenging due to compounded distortions such as clipping, band-pass filtering, digital artifacts, noise, reverberation, and low sampling rates.
+                        Existing systems, including vocoder-based approaches, often sacrifice signal fidelity, while diffusion models remain impractical for streaming. Moreover, most assume a fixed target sampling rate, requiring external resampling that leads to redundant computations.
+                    </p>
+                    <p style="text-align: justify;">
+                        We present <strong>TF-Restormer</strong>, an encoder-decoder architecture that concentrates analysis on input-bandwidth with a time-frequency dual-path encoder and reconstructs missing high-frequency bands through a light decoder with frequency extension queries. It enables efficient and universal restoration across arbitrary input-output rates without redundant resampling.
+                    </p>
+                    <p style="text-align: justify;">
+                        To support adversarial training across diverse rates, we introduce a shared sampling-frequency-independent (SFI) STFT discriminator. TF-Restormer further supports streaming with a causal time module, and improves robustness under extreme degradations by injecting spectral inductive bias into the frequency module.
+                        Finally, we propose a scaled log-spectral loss that stabilizes optimization under severe conditions while emphasizing well-predicted spectral details.
+                    </p>
+                    <p style="text-align: justify;">
+                        As a single model across sampling rates, TF-Restormer consistently delivers well-balanced results in signal fidelity, semantic preservation, and perceptual quality for both offline and streaming scenarios.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Architecture Overview -->
+            <div class="card fade-in">
+                <h2 class="card-title text-center">System Architecture</h2>
+                <p class="text-center" style="font-style: italic; margin-bottom: 20px;">
+                    Asymmetric encoder-decoder framework: Heavy processing on input bandwidth (encoder), lightweight frequency extension (decoder)
+                </p>
+                <div class="image-container">
+                    <img src="img/architecture.png" alt="TF-Restormer Architecture" class="image">
+                </div>
+
+                <!-- Architecture Details -->
+                <div class="card mt-4">
+                    <h3 class="card-title text-center">Model Components</h3>
+
+                    <!-- Encoder-Decoder Overview -->
+                    <div class="grid grid-cols-2 gap-3 mt-3">
+                        <div style="background: var(--bg-tertiary); padding: 20px; border-radius: 10px;">
+                            <h4 style="color: var(--blue-600); margin-bottom: 10px;">
+                                <i class="fas fa-compress"></i> TF-Encoder (Heavy Processing)
+                            </h4>
+                            <ul style="font-size: 0.9rem; line-height: 1.8;">
+                                <li><strong>Input:</strong> Complex STFT <span class="math">$\mathbf{X} \in \mathbb{R}^{F_E \times T \times 2}$</span></li>
+                                <li><strong>Processing:</strong> Conv2D(3×3) → LayerNorm → Freq PE</li>
+                                <li><strong>Architecture:</strong> <span class="math">$B_E = 6$</span> alternating TF blocks</li>
+                                <li><strong>Channels:</strong> <span class="math">$C_E = 128$</span> feature dimensions</li>
+                                <li><strong>Purpose:</strong> Analyze degraded input, extract clean representations</li>
+                            </ul>
+                        </div>
+                        <div style="background: var(--bg-tertiary); padding: 20px; border-radius: 10px;">
+                            <h4 style="color: var(--blue-600); margin-bottom: 10px;">
+                                <i class="fas fa-expand"></i> TF-Decoder (Lightweight Extension)
+                            </h4>
+                            <ul style="font-size: 0.9rem; line-height: 1.8;">
+                                <li><strong>Architecture:</strong> <span class="math">$B_D = 3$</span> blocks (3× fewer than encoder)</li>
+                                <li><strong>Channels:</strong> <span class="math">$C_D = 64$</span> feature dimensions</li>
+                                <li><strong>Extension Query:</strong> <span class="math">$\mathbf{q}_{\text{ext}} \in \mathbb{R}^{(F_D - F_E) \times T \times C_D}$</span></li>
+                                <li><strong>Output:</strong> Complex STFT <span class="math">$\mathbf{Y} \in \mathbb{R}^{F_D \times T \times 2}$</span></li>
+                                <li><strong>Purpose:</strong> Reconstruct missing high frequencies</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Dual-Path Modules -->
+                    <h4 class="text-center mt-4" style="color: var(--blue-600);">Time-Frequency Dual-Path Processing</h4>
+                    <div style="background: var(--bg-tertiary); padding: 20px; border-radius: 10px; margin-top: 15px;">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <h5 style="color: var(--blue-500); margin-bottom: 8px;">
+                                    <i class="fas fa-clock"></i> Time Module
+                                </h5>
+                                <ul style="font-size: 0.85rem; line-height: 1.6;">
+                                    <li>Macaron-style: ConvFFN + MHSA + ConvFFN</li>
+                                    <li>Multi-head attention: <span class="math">$H = 4$</span> heads</li>
+                                    <li>Processes <span class="math">$F$</span> sequences of length <span class="math">$T$</span></li>
+                                    <li>Rotary position embeddings (RoPE)</li>
+                                    <li>Streaming variant: Mamba (<span class="math">$d_{\text{state}} = 16$</span>)</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 style="color: var(--blue-500); margin-bottom: 8px;">
+                                    <i class="fas fa-wave-square"></i> Frequency Module
+                                </h5>
+                                <ul style="font-size: 0.85rem; line-height: 1.6;">
+                                    <li>Macaron-style: ConvFFN + MHSA/MHCA + ConvFFN</li>
+                                    <li>Linformer projection: <span class="math">$\mathbf{A}_h \in \mathbb{R}^{F_{\text{max}} \times F_{\text{proj}}}$</span>, <span class="math">$F_{\text{proj}} = 512$</span></li>
+                                    <li>Processes <span class="math">$T$</span> sequences of length <span class="math">$F$</span></li>
+                                    <li>Cross-attention in decoder (encoder K/V)</li>
+                                    <li>ConvFFN: <span class="math">$K = 7$</span>, SwiGLU activation</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Innovations -->
+                <div class="card mt-4">
+                    <h3 class="card-title text-center">Key Innovations</h3>
+
+                    <div class="grid grid-cols-3 gap-3 mt-3">
+                        <div style="background: var(--bg-tertiary); padding: 15px; border-radius: 10px;">
+                            <h5 style="color: var(--blue-500); margin-bottom: 8px;">
+                                <i class="fas fa-puzzle-piece"></i> Extension Queries
+                            </h5>
+                            <p style="font-size: 0.85rem; line-height: 1.6;">
+                                Learnable frequency patterns <span class="math">$\mathbf{q}_{\text{ext}}$</span> shared across frames. Enables bandwidth extension from <span class="math">$F_E$</span> to <span class="math">$F_D$</span> without resampling.
+                            </p>
+                        </div>
+
+                        <div style="background: var(--bg-tertiary); padding: 15px; border-radius: 10px;">
+                            <h5 style="color: var(--blue-500); margin-bottom: 8px;">
+                                <i class="fas fa-shield-alt"></i> SFI-STFT Discriminator
+                            </h5>
+                            <p style="font-size: 0.85rem; line-height: 1.6;">
+                                5 multi-scale discriminators {20, 40, 60, 80, 100}ms. Enables single-model training across all sampling rates.
+                            </p>
+                        </div>
+
+                        <div style="background: var(--bg-tertiary); padding: 15px; border-radius: 10px;">
+                            <h5 style="color: var(--blue-500); margin-bottom: 8px;">
+                                <i class="fas fa-chart-line"></i> Scaled Log-Spectral Loss
+                            </h5>
+                            <p style="font-size: 0.85rem; line-height: 1.6;">
+                                Loss: <span class="math">$$\mathcal{L}_s = w_{tf} \cdot \log\left(1 + \frac{|Y_{c,tf} - S_{c,tf}|}{w_{tf}}\right)$$</span><br>
+                                Emphasizes well-predicted regions, suppresses large deviations.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Training Strategy -->
+                    <h4 class="text-center mt-4" style="color: var(--blue-600);">Training Strategy</h4>
+                    <div style="background: var(--bg-tertiary); padding: 15px; border-radius: 10px; margin-top: 10px;">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <h5 style="color: var(--blue-500); font-size: 0.95rem;">Phase 1: Pretraining</h5>
+                                <ul style="font-size: 0.85rem; line-height: 1.5;">
+                                    <li>Perceptual loss (WavLM-based)</li>
+                                    <li>Scaled log-spectral loss</li>
+                                    <li>Complex domain supervision</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h5 style="color: var(--blue-500); font-size: 0.95rem;">Phase 2: Adversarial Training</h5>
+                                <ul style="font-size: 0.85rem; line-height: 1.5;">
+                                    <li>LS-GAN loss + Feature matching</li>
+                                    <li>Human feedback loss (PESQ, UTMOS)</li>
+                                    <li>Multi-scale SFI discriminators</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Audio Samples Section -->
+    <section id="demo" class="section">
+        <div class="container">
+            <h2 class="card-title text-center mb-3">Audio Samples</h2>
+
+
+            <!-- Dataset Tabs -->
+            <div class="dataset-tabs">
+                <div class="tab-headers">
+                    <button class="tab-header active" onclick="switchTab('universe')">
+                        <i class="fas fa-star"></i> UNIVERSE Dataset
+                    </button>
+                    <button class="tab-header" onclick="switchTab('vctk')">
+                        <i class="fas fa-microphone"></i> VCTK-DEMAND
+                    </button>
+                    <button class="tab-header" onclick="switchTab('vctk_clean')">
+                        <i class="fas fa-chart-line"></i> VCTK Clean BWE
+                    </button>
+                    <button class="tab-header" onclick="switchTab('vctk_noisy')">
+                        <i class="fas fa-volume-up"></i> VCTK Noisy BWE
+                    </button>
+                    <button class="tab-header" onclick="switchTab('voxceleb')">
+                        <i class="fas fa-users"></i> VoxCeleb Real
+                    </button>
+                </div>
+
+                <!-- UNIVERSE Dataset Tab -->
+                <div id="universe-tab" class="tab-content active">
+                    <h3>UNIVERSE Dataset Comparison</h3>
+                    <p>Speech enhancement comparison on UNIVERSE dataset with various baseline models:</p>
+
+                    <!-- Sample Selector -->
+                    <div class="sample-selector mb-4">
+                        <label><strong>Select Sample: </strong></label>
+                        <select id="universe-sample-select" onchange="updateUniverseSample()" class="form-select">
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+
+                    <!-- Audio Comparison Grid -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="card">
+                            <h4 class="text-center">Input (Noisy)</h4>
+                            <audio id="universe-input" controls style="width: 100%;">
+                                <source src="samples/universe/input/0015b_input.wav">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">TF-Restormer (Ours)</h4>
+                            <audio id="universe-ours" controls style="width: 100%;">
+                                <source src="samples/universe/ours_TF_Restormer/0015b_input_enhanced.wav">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">TF-Restormer Streaming (Ours)</h4>
+                            <audio id="universe-streaming" controls style="width: 100%;">
+                                <source src="samples/universe/ours_TF_Restormer_streaming/0015b_input_enhanced.wav">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">Ground Truth (Clean)</h4>
+                            <audio id="universe-clean" controls style="width: 100%;">
+                                <source src="samples/universe/clean/0015d_target.wav">
+                            </audio>
+                        </div>
+                    </div>
+
+                    <!-- Baseline Models -->
+                    <details class="baseline-models mt-4" open>
+                        <summary class="btn btn-secondary" style="cursor: pointer;">
+                            <i class="fas fa-chart-line"></i> Compare with Baseline Models
+                        </summary>
+                        <div class="grid grid-cols-3 gap-3 mt-3">
+                            <div class="card">
+                                <h5 class="text-center">UNIVERSE</h5>
+                                <audio id="universe-baseline-universe" controls style="width: 100%;">
+                                    <source src="samples/universe/universe/0015b_input.wav">
+                                </audio>
+                            </div>
+                            <div class="card">
+                                <h5 class="text-center">UNIVERSE++</h5>
+                                <audio id="universe-baseline-universepp" controls style="width: 100%;">
+                                    <source src="samples/universe/universepp/0015b_input.wav">
+                                </audio>
+                            </div>
+                            <div class="card">
+                                <h5 class="text-center">StoRM</h5>
+                                <audio id="universe-baseline-storm" controls style="width: 100%;">
+                                    <source src="samples/universe/storm/0015b_input.wav">
+                                </audio>
+                            </div>
+                            <div class="card">
+                                <h5 class="text-center">TF-Locoformer</h5>
+                                <audio id="universe-baseline-tflocoformer" controls style="width: 100%;">
+                                    <source src="samples/universe/tflocoformer/0015b_input.wav">
+                                </audio>
+                            </div>
+                            <div class="card">
+                                <h5 class="text-center">VoiceFixer</h5>
+                                <audio id="universe-baseline-voicefixer" controls style="width: 100%;">
+                                    <source src="samples/universe/VoiceFixer_16k/0015.wav">
+                                </audio>
+                            </div>
+                            <div class="card">
+                                <h5 class="text-center">FINALLY</h5>
+                                <audio id="universe-baseline-finally" controls style="width: 100%;">
+                                    <source src="samples/universe/FINALLY_16k/0015.wav">
+                                </audio>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- VCTK-DEMAND Dataset Tab -->
+                <div id="vctk-tab" class="tab-content" style="display: none;">
+                    <h3>VCTK-DEMAND Dataset Comparison</h3>
+                    <p>Speech enhancement and denoising comparison on VCTK-DEMAND dataset:</p>
+
+                    <!-- Sample Selector -->
+                    <div class="sample-selector mb-4">
+                        <label><strong>Select Sample: </strong></label>
+                        <select id="vctk-sample-select" onchange="updateVCTKSample()" class="form-select">
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+
+                    <!-- Audio Comparison Grid -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="card">
+                            <h4 class="text-center">Input (Degraded)</h4>
+                            <audio id="vctk-input" controls style="width: 100%;">
+                                <source src="samples/vctk_demand/input_16k/p232_010.wav">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">TF-Restormer (Ours)</h4>
+                            <audio id="vctk-ours" controls style="width: 100%;">
+                                <source src="samples/vctk_demand/our_TF_Restormer/p232_010.wav">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">TF-Restormer Streaming (Ours)</h4>
+                            <audio id="vctk-streaming" controls style="width: 100%;">
+                                <source src="samples/vctk_demand/our_TF_Restormer_streaming/p232_010.wav">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">Ground Truth (Clean)</h4>
+                            <audio id="vctk-clean" controls style="width: 100%;">
+                                <source src="samples/vctk_demand/clean_16k/p232_010.wav">
+                            </audio>
+                        </div>
+                    </div>
+
+                    <!-- Baseline Models -->
+                    <details class="baseline-models mt-4" open>
+                        <summary class="btn btn-secondary" style="cursor: pointer;">
+                            <i class="fas fa-chart-line"></i> Compare with Baseline Models
+                        </summary>
+                        <div class="grid grid-cols-3 gap-3 mt-3">
+                            <div class="card">
+                                <h5 class="text-center">DB-AIAT</h5>
+                                <audio id="vctk-baseline-dbaiat" controls style="width: 100%;">
+                                    <source src="samples/vctk_demand/DBAIAT/p232_010.wav">
+                                </audio>
+                            </div>
+                            <div class="card">
+                                <h5 class="text-center">MP-SENet</h5>
+                                <audio id="vctk-baseline-mpsenet" controls style="width: 100%;">
+                                    <source src="samples/vctk_demand/mpsenet/p232_010.wav">
+                                </audio>
+                            </div>
+                            <div class="card">
+                                <h5 class="text-center">TF-Locoformer</h5>
+                                <audio id="vctk-baseline-tflocoformer" controls style="width: 100%;">
+                                    <source src="samples/vctk_demand/tflocoformer/p232_010_enhanced.wav">
+                                </audio>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+
+                <!-- VCTK Clean BWE Tab -->
+                <div id="vctk_clean-tab" class="tab-content" style="display: none;">
+                    <h3>VCTK Clean Bandwidth Extension</h3>
+                    <p>Pure bandwidth extension performance on clean VCTK samples:</p>
+
+                    <!-- BWE Case Selector -->
+                    <div class="sample-selector mb-4">
+                        <label><strong>Select BWE Case: </strong></label>
+                        <select id="vctk-clean-bwe-select" onchange="updateVCTKCleanBWE()" class="form-select">
+                            <option value="8k_to_16k">8kHz → 16kHz</option>
+                            <option value="8k_to_44_1k">8kHz → 44.1kHz</option>
+                            <option value="16k_to_48k">16kHz → 48kHz</option>
+                        </select>
+                    </div>
+
+                    <!-- Sample Selector -->
+                    <div class="sample-selector mb-4">
+                        <label><strong>Select Sample: </strong></label>
+                        <select id="vctk-clean-sample-select" onchange="updateVCTKCleanSample()" class="form-select">
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+
+                    <!-- Audio Comparison Grid -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="card">
+                            <h4 class="text-center">Input (Low-res)</h4>
+                            <audio id="vctk-clean-input" controls style="width: 100%;">
+                                <source src="samples/vctk_clean/8k_to_16k/input/p360_008_mic1.wav">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">TF-Restormer (Ours)</h4>
+                            <audio id="vctk-clean-ours" controls style="width: 100%;">
+                                <source src="samples/vctk_clean/8k_to_16k/our_TF_Restormer/p360_008_mic1.wav">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">Ground Truth (High-res)</h4>
+                            <audio id="vctk-clean-clean" controls style="width: 100%;">
+                                <source src="samples/vctk_clean/8k_to_16k/clean/p360_008_mic1.wav">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center" id="vctk-clean-baseline-title">AP-BWE</h4>
+                            <audio id="vctk-clean-baseline" controls style="width: 100%;">
+                                <source src="samples/vctk_clean/8k_to_16k/AP_BWE_16k/p360_008_mic1.wav">
+                            </audio>
+                        </div>
+                    </div>
+
+                    <!-- Baseline Models -->
+                    <details class="baseline-models mt-4" open>
+                        <summary class="btn btn-secondary" style="cursor: pointer;">
+                            <i class="fas fa-chart-line"></i> Compare with Baseline BWE Models
+                        </summary>
+                        <div id="vctk-clean-baselines" class="grid grid-cols-3 gap-3 mt-3">
+                            <!-- Will be populated dynamically based on BWE case -->
+                        </div>
+                    </details>
+                </div>
+
+                <!-- VCTK Noisy BWE Tab -->
+                <div id="vctk_noisy-tab" class="tab-content" style="display: none;">
+                    <h3>VCTK Noisy Bandwidth Extension</h3>
+                    <p>Joint bandwidth extension and denoising on noisy VCTK samples:</p>
+
+                    <!-- BWE Case Selector -->
+                    <div class="sample-selector mb-4">
+                        <label><strong>Select BWE Case: </strong></label>
+                        <select id="vctk-noisy-bwe-select" onchange="updateVCTKNoisyBWE()" class="form-select">
+                            <option value="8k_to_16k">8kHz → 16kHz</option>
+                            <option value="8k_to_44_1k">8kHz → 44.1kHz</option>
+                            <option value="16k_to_48k">16kHz → 48kHz</option>
+                        </select>
+                    </div>
+
+                    <!-- Sample Selector -->
+                    <div class="sample-selector mb-4">
+                        <label><strong>Select Sample: </strong></label>
+                        <select id="vctk-noisy-sample-select" onchange="updateVCTKNoisySample()" class="form-select">
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+
+                    <!-- Audio Comparison Grid -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="card">
+                            <h4 class="text-center">Input (Noisy + Low-res)</h4>
+                            <audio id="vctk-noisy-input" controls style="width: 100%;">
+                                <source src="samples/vctk_noisy/8k_to_16k/input/p360_022_mic1.wav">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">TF-Restormer (Ours)</h4>
+                            <audio id="vctk-noisy-ours" controls style="width: 100%;">
+                                <source src="samples/vctk_noisy/8k_to_16k/ours_TF_Restormer/p360_022_mic1.wav">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">TF-Restormer Streaming (Ours)</h4>
+                            <audio id="vctk-noisy-streaming" controls style="width: 100%;">
+                                <source src="samples/vctk_noisy/8k_to_16k/ours_TF_Restormer_streaming/p360_022_mic1.wav">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">Ground Truth (Clean + High-res)</h4>
+                            <audio id="vctk-noisy-clean" controls style="width: 100%;">
+                                <source src="samples/vctk_noisy/8k_to_16k/clean/p360_022_mic1.wav">
+                            </audio>
+                        </div>
+                    </div>
+
+                    <!-- Baseline Models -->
+                    <details class="baseline-models mt-4" open>
+                        <summary class="btn btn-secondary" style="cursor: pointer;">
+                            <i class="fas fa-chart-line"></i> Compare with Baseline Models
+                        </summary>
+                        <div id="vctk-noisy-baselines" class="grid grid-cols-3 gap-3 mt-3">
+                            <!-- Will be populated dynamically based on BWE case -->
+                        </div>
+                    </details>
+                </div>
+
+                <!-- VoxCeleb Real Dataset Tab -->
+                <div id="voxceleb-tab" class="tab-content" style="display: none;">
+                    <h3>VoxCeleb Real-world Audio</h3>
+                    <p>Real-world audio enhancement results versus FINALLY model:</p>
+
+                    <!-- Sample Selector -->
+                    <div class="sample-selector mb-4">
+                        <label><strong>Select Sample: </strong></label>
+                        <select id="voxceleb-sample-select" onchange="updateVoxCelebSample()" class="form-select">
+                            <!-- Options will be populated dynamically -->
+                        </select>
+                    </div>
+
+                    <!-- Audio Comparison Grid -->
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="card">
+                            <h4 class="text-center">Input (Real-world)</h4>
+                            <audio id="voxceleb-input" controls style="width: 100%;">
+                                <source src="samples/voxceleb_real/input/m80.wav">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">TF-Restormer (48kHz)</h4>
+                            <audio id="voxceleb-ours-48k" controls style="width: 100%;">
+                                <source src="samples/voxceleb_real/ours_TF_Restormer_to48k/m80-id10301-VIAnMw7J5tI-00010.wav">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">TF-Restormer Streaming (Ours, 16kHz)</h4>
+                            <audio id="voxceleb-streaming-16k" controls style="width: 100%;">
+                                <source src="samples/voxceleb_real/ours_TF_Restormer_streaming_to16k/m80-id10301-VIAnMw7J5tI-00010.wav">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">Baseline(FINALLY)</h4>
+                            <audio id="voxceleb-finally" controls style="width: 100%;">
+                                <source src="samples/voxceleb_real/FINALLY/m80.wav">
+                            </audio>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- More Examples (Keeping for backwards compatibility) -->
+            <details class="mt-4" style="display: none;">
+                <summary class="btn btn-secondary" style="cursor: pointer;">
+                    <i class="fas fa-chevron-down"></i> More Examples
+                </summary>
+                <div class="grid grid-cols-2 mt-3">
+                    <div class="card">
+                        <h5 class="text-center">Example 2 - Input</h5>
+                        <div class="audio-player">
+                            <audio controls style="width: 100%;">
+                                <source src="samples/universe/input/0034b_input.wav">
+                            </audio>
+                        </div>
+                        <div class="image-container">
+                            <img src="img/real_data_output_2.png" class="image" alt="Output Spectrogram 3">
+                        </div>
+                    </div>
+                </div>
+            </details>
+        </div>
+    </section>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <p>© 2025 TF-Restormer.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" onclick="scrollToTop()">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- JavaScript -->
+    <script>
+        // Dataset configurations with available samples
+        const datasetConfig = {
+            universe: {
+                samples: [
+                    '0004', '0006', '0007', '0013', '0014', '0015', '0031', '0034', '0044', '0045', '0061', '0076', '0090', '0095'
+                ],
+                filePatterns: {
+                    input: '${sample}b_input.wav',
+                    ours: '${sample}b_input.wav',
+                    streaming: '${sample}b_input.wav',
+                    clean: '${sample}d_target.wav',
+                    baselines: {
+                        universe: '${sample}b_input.wav',
+                        universepp: '${sample}b_input.wav',
+                        storm: '${sample}b_input.wav',
+                        tflocoformer: '${sample}b_input_enhanced.wav',
+                        voicefixer: '${sample}.wav',
+                        finally: '${sample}.wav'
+                    }
+                }
+            },
+            voxceleb: {
+                samples: ['m80', 'f81', 'f82', 'm83', 'm98'],
+                filePatterns: {
+                    input: '${sample}.wav',
+                    ours48k: '${mappedSample}.wav',
+                    streaming16k: '${mappedSample}.wav',
+                    baselines: {
+                        finally: '${sample}.wav'
+                    }
+                }
+            }
+        };
+
+        // VoxCeleb ID mapping (since filenames have specific IDs)
+        const voxcelebMapping = {
+            'm80': 'm80-id10301-VIAnMw7J5tI-00010',
+            'f81': 'f81-id10270-5r0dWxy17C8-00014',
+            'f82': 'f82-id10308-XQWpVt5n3Ic-00010',
+            'm83': 'm83-id10276-lWeNK_hi-aI-00002',
+            'm98': 'm98-id10279-PQHz4fGHPK8-00006'
+        };
+
+        // Initialize sample selectors dynamically
+        function initializeSampleSelectors() {
+            // Initialize UNIVERSE selector
+            const universeSelect = document.getElementById('universe-sample-select');
+            if (universeSelect) {
+                universeSelect.innerHTML = '';
+                datasetConfig.universe.samples.forEach((sample, index) => {
+                    const option = document.createElement('option');
+                    option.value = sample;
+                    option.text = `Sample ${sample}`;
+                    if (index === 0) option.selected = true;
+                    universeSelect.appendChild(option);
+                });
+            }
+
+            // Initialize VCTK selector (VCTK-DEMAND only)
+            const vctkSelect = document.getElementById('vctk-sample-select');
+            if (vctkSelect) {
+                vctkSelect.innerHTML = '';
+                const vctkSamples = ['p232_010', 'p232_095', 'p232_160', 'p232_263', 'p232_324', 'p257_009', 'p257_050', 'p257_070', 'p257_151', 'p257_260'];
+                vctkSamples.forEach((sample, index) => {
+                    const option = document.createElement('option');
+                    option.value = sample;
+                    option.text = sample;
+                    if (index === 0) option.selected = true;
+                    vctkSelect.appendChild(option);
+                });
+            }
+
+            // Initialize VCTK Clean sample selector with default BWE case
+            const vctkCleanSelect = document.getElementById('vctk-clean-sample-select');
+            if (vctkCleanSelect) {
+                const defaultCleanSamples = vctkCleanSamplesByCase['8k_to_16k'] || [];
+                defaultCleanSamples.forEach((sample, index) => {
+                    const option = document.createElement('option');
+                    option.value = sample;
+                    option.text = sample;
+                    if (index === 0) option.selected = true;
+                    vctkCleanSelect.appendChild(option);
+                });
+            }
+
+            // Initialize VCTK Noisy sample selector with default BWE case
+            const vctkNoisySelect = document.getElementById('vctk-noisy-sample-select');
+            if (vctkNoisySelect) {
+                const defaultNoisySamples = vctkNoisySamplesByCase['8k_to_16k'] || [];
+                defaultNoisySamples.forEach((sample, index) => {
+                    const option = document.createElement('option');
+                    option.value = sample;
+                    option.text = sample;
+                    if (index === 0) option.selected = true;
+                    vctkNoisySelect.appendChild(option);
+                });
+            }
+
+            // Initialize VoxCeleb selector
+            const voxcelebSelect = document.getElementById('voxceleb-sample-select');
+            if (voxcelebSelect) {
+                voxcelebSelect.innerHTML = '';
+                datasetConfig.voxceleb.samples.forEach((sample, index) => {
+                    const option = document.createElement('option');
+                    option.value = sample;
+                    option.text = `${sample} (${sample.charAt(0) === 'm' ? 'Male' : 'Female'})`;
+                    if (index === 0) option.selected = true;
+                    voxcelebSelect.appendChild(option);
+                });
+            }
+        }
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
+        const body = document.body;
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            body.setAttribute('data-theme', newTheme);
+
+            if (newTheme === 'dark') {
+                themeIcon.textContent = '🌙';
+                themeToggle.classList.add('dark');
+            } else {
+                themeIcon.textContent = '☀️';
+                themeToggle.classList.remove('dark');
+            }
+
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        body.setAttribute('data-theme', savedTheme);
+        if (savedTheme === 'dark') {
+            themeIcon.textContent = '🌙';
+            themeToggle.classList.add('dark');
+        }
+
+        // Smooth Scroll for Navigation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const headerHeight = document.querySelector('.header').offsetHeight;
+                    const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - headerHeight;
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Back to Top Button
+        const backToTopButton = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(tab => {
+                tab.style.display = 'none';
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all tab headers
+            const tabHeaders = document.querySelectorAll('.tab-header');
+            tabHeaders.forEach(header => header.classList.remove('active'));
+
+            // Show selected tab and mark header as active
+            const selectedTab = document.getElementById(tabName + '-tab');
+            const selectedHeader = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
+
+            if (selectedTab) {
+                selectedTab.style.display = 'block';
+                selectedTab.classList.add('active');
+            }
+            if (selectedHeader) {
+                selectedHeader.classList.add('active');
+            }
+
+            // Load initial samples for each tab
+            if (tabName === 'universe') {
+                updateUniverseSample();
+            } else if (tabName === 'vctk') {
+                updateVCTKSample();
+            } else if (tabName === 'vctk_clean') {
+                updateVCTKCleanBWE();
+            } else if (tabName === 'vctk_noisy') {
+                updateVCTKNoisyBWE();
+            } else if (tabName === 'voxceleb') {
+                updateVoxCelebSample();
+            }
+        }
+
+        // Sample update functions
+        function updateUniverseSample() {
+            const sample = document.getElementById('universe-sample-select').value;
+
+            // Update main comparison audios
+            document.getElementById('universe-input').innerHTML =
+                `<source src="samples/universe/input/${sample}b_input.wav">`;
+            document.getElementById('universe-ours').innerHTML =
+                `<source src="samples/universe/ours_TF_Restormer/${sample}b_input.wav">`;
+            document.getElementById('universe-streaming').innerHTML =
+                `<source src="samples/universe/ours_TF_Restormer_streaming/${sample}b_input.wav">`;
+            document.getElementById('universe-clean').innerHTML =
+                `<source src="samples/universe/clean/${sample}d_target.wav">`;
+
+            // Update baseline audios
+            document.getElementById('universe-baseline-universe').innerHTML =
+                `<source src="samples/universe/universe/${sample}b_input.wav">`;
+            document.getElementById('universe-baseline-universepp').innerHTML =
+                `<source src="samples/universe/universepp/${sample}b_input.wav">`;
+            document.getElementById('universe-baseline-storm').innerHTML =
+                `<source src="samples/universe/storm/${sample}b_input.wav">`;
+            document.getElementById('universe-baseline-tflocoformer').innerHTML =
+                `<source src="samples/universe/tflocoformer/${sample}b_input_enhanced.wav">`;
+            document.getElementById('universe-baseline-voicefixer').innerHTML =
+                `<source src="samples/universe/VoiceFixer_16k/${sample}b_input.wav">`;
+            document.getElementById('universe-baseline-finally').innerHTML =
+                `<source src="samples/universe/FINALLY_16k/${sample}.wav">`;
+
+            // Reload all audios
+            document.querySelectorAll('#universe-tab audio').forEach(audio => audio.load());
+        }
+
+        // VCTK-DEMAND functions (simplified)
+        function updateVCTKSample() {
+            const sample = document.getElementById('vctk-sample-select').value;
+
+            document.getElementById('vctk-input').innerHTML =
+                `<source src="samples/vctk_demand/input_16k/${sample}.wav">`;
+            document.getElementById('vctk-ours').innerHTML =
+                `<source src="samples/vctk_demand/our_TF_Restormer/${sample}.wav">`;
+            document.getElementById('vctk-streaming').innerHTML =
+                `<source src="samples/vctk_demand/our_TF_Restormer_streaming/${sample}.wav">`;
+            document.getElementById('vctk-clean').innerHTML =
+                `<source src="samples/vctk_demand/clean_16k/${sample}.wav">`;
+
+            document.getElementById('vctk-baseline-dbaiat').innerHTML =
+                `<source src="samples/vctk_demand/DBAIAT/${sample}.wav">`;
+            document.getElementById('vctk-baseline-mpsenet').innerHTML =
+                `<source src="samples/vctk_demand/mpsenet/${sample}.wav">`;
+            document.getElementById('vctk-baseline-tflocoformer').innerHTML =
+                `<source src="samples/vctk_demand/tflocoformer/${sample}_enhanced.wav">`;
+
+            document.querySelectorAll('#vctk-tab audio').forEach(audio => audio.load());
+        }
+
+        // VCTK Clean BWE functions
+        let currentVCTKCleanBWE = '8k_to_16k';
+        const vctkCleanSamplesByCase = {
+            '8k_to_16k': ['p360_008_mic1', 'p362_009_mic1', 'p363_018_mic1', 'p374_008_mic1', 's5_006_mic1'],
+            '8k_to_44_1k': ['p360_023_mic1', 'p361_226_mic1', 'p363_100_mic1', 'p364_200_mic1', 'p376_148_mic1'],
+            '16k_to_48k': ['p360_072_mic1', 'p362_054_mic1', 'p363_260_mic1', 'p364_129_mic1', 'p374_290_mic1']
+        };
+
+        function updateVCTKCleanBWE() {
+            const selectedBWE = document.getElementById('vctk-clean-bwe-select').value;
+            currentVCTKCleanBWE = selectedBWE;
+
+            // Get samples for the selected BWE case
+            const samples = vctkCleanSamplesByCase[selectedBWE] || [];
+
+            // Update sample selector
+            const sampleSelect = document.getElementById('vctk-clean-sample-select');
+            sampleSelect.innerHTML = '';
+            samples.forEach((sample, index) => {
+                const option = document.createElement('option');
+                option.value = sample;
+                option.text = sample;
+                if (index === 0) option.selected = true;
+                sampleSelect.appendChild(option);
+            });
+
+            updateVCTKCleanSample();
+            updateVCTKCleanBaselines();
+        }
+
+        function updateVCTKCleanSample() {
+            const sample = document.getElementById('vctk-clean-sample-select').value;
+            const basePath = `samples/vctk_clean/${currentVCTKCleanBWE}`;
+
+            document.getElementById('vctk-clean-input').innerHTML =
+                `<source src="${basePath}/input/${sample}.wav">`;
+            document.getElementById('vctk-clean-ours').innerHTML =
+                `<source src="${basePath}/our_TF_Restormer/${sample}.wav">`;
+            document.getElementById('vctk-clean-clean').innerHTML =
+                `<source src="${basePath}/clean/${sample}.wav">`;
+
+            // Update main baseline
+            const baselines = getVCTKCleanBaselines(currentVCTKCleanBWE);
+            if (baselines.length > 0) {
+                document.getElementById('vctk-clean-baseline').innerHTML =
+                    `<source src="${basePath}/${baselines[0]}/${sample}.wav">`;
+                document.getElementById('vctk-clean-baseline-title').textContent = formatBaselineName(baselines[0]);
+            }
+
+            document.querySelectorAll('#vctk_clean-tab audio').forEach(audio => audio.load());
+        }
+
+        function getVCTKCleanBaselines(bweCase) {
+            const baselineMap = {
+                '8k_to_16k': ['AP_BWE_16k', 'frepainter_16k', 'NVSR_16k', 'VoiceFixer_16k'],
+                '8k_to_44_1k': ['AP_BWE_44_1k', 'frepainterE_44_1k', 'NVSR', 'VoiceFixer'],
+                '16k_to_48k': ['AP_BWE', 'frepainter']
+            };
+            return baselineMap[bweCase] || [];
+        }
+
+        function updateVCTKCleanBaselines() {
+            const baselines = getVCTKCleanBaselines(currentVCTKCleanBWE);
+            const baselinesContainer = document.getElementById('vctk-clean-baselines');
+            const sample = document.getElementById('vctk-clean-sample-select').value;
+            const basePath = `samples/vctk_clean/${currentVCTKCleanBWE}`;
+
+            baselinesContainer.innerHTML = '';
+            baselines.forEach(baseline => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
+                    <h5 class="text-center">${formatBaselineName(baseline)}</h5>
+                    <audio controls style="width: 100%;">
+                        <source src="${basePath}/${baseline}/${sample}.wav">
+                    </audio>
+                `;
+                baselinesContainer.appendChild(div);
+            });
+        }
+
+        // VCTK Noisy BWE functions
+        let currentVCTKNoisyBWE = '8k_to_16k';
+        const vctkNoisySamplesByCase = {
+            '8k_to_16k': ['p360_022_mic1', 'p361_076_mic1', 'p361_194_mic1', 'p362_039_mic1', 'p374_109_mic1'],
+            '8k_to_44_1k': ['p363_202_mic1', 'p364_017_mic1', 'p376_324_mic1', 's5_216_mic1', 's5_284_mic1'],
+            '16k_to_48k': ['p360_203_mic1', 'p362_039_mic1', 'p363_002_mic1', 'p363_012_mic1', 's5_046_mic1']
+        };
+
+        function updateVCTKNoisyBWE() {
+            const selectedBWE = document.getElementById('vctk-noisy-bwe-select').value;
+            currentVCTKNoisyBWE = selectedBWE;
+
+            // Get samples for the selected BWE case
+            const samples = vctkNoisySamplesByCase[selectedBWE] || [];
+
+            // Update sample selector
+            const sampleSelect = document.getElementById('vctk-noisy-sample-select');
+            sampleSelect.innerHTML = '';
+            samples.forEach((sample, index) => {
+                const option = document.createElement('option');
+                option.value = sample;
+                option.text = sample;
+                if (index === 0) option.selected = true;
+                sampleSelect.appendChild(option);
+            });
+
+            updateVCTKNoisySample();
+            updateVCTKNoisyBaselines();
+        }
+
+        function updateVCTKNoisySample() {
+            const sample = document.getElementById('vctk-noisy-sample-select').value;
+            const basePath = `samples/vctk_noisy/${currentVCTKNoisyBWE}`;
+
+            // Check which method names exist for this BWE case
+            const ourMethod = (currentVCTKNoisyBWE === '16k_to_48k') ? 'our_TF_Restormer' : 'ours_TF_Restormer';
+            const ourStreamingMethod = (currentVCTKNoisyBWE === '16k_to_48k') ? 'our_TF_Restormer_streaming' : 'ours_TF_Restormer_streaming';
+
+            document.getElementById('vctk-noisy-input').innerHTML =
+                `<source src="${basePath}/input/${sample}.wav">`;
+            document.getElementById('vctk-noisy-ours').innerHTML =
+                `<source src="${basePath}/${ourMethod}/${sample}.wav">`;
+            document.getElementById('vctk-noisy-streaming').innerHTML =
+                `<source src="${basePath}/${ourStreamingMethod}/${sample}.wav">`;
+            document.getElementById('vctk-noisy-clean').innerHTML =
+                `<source src="${basePath}/clean/${sample}.wav">`;
+
+            document.querySelectorAll('#vctk_noisy-tab audio').forEach(audio => audio.load());
+        }
+
+        function getVCTKNoisyBaselines(bweCase) {
+            const baselineMap = {
+                '8k_to_16k': ['StoRM', 'universepp', 'VoiceFixer_16k'],
+                '8k_to_44_1k': ['VoiceFixer'],
+                '16k_to_48k': []
+            };
+            return baselineMap[bweCase] || [];
+        }
+
+        function formatBaselineName(baseline) {
+            const nameMap = {
+                // VCTK Clean BWE baselines
+                'AP_BWE_16k': 'AP-BWE',
+                'AP_BWE_44_1k': 'AP-BWE',
+                'AP_BWE': 'AP-BWE',
+                'frepainter_16k': 'Frepainter',
+                'frepainterE_44_1k': 'Frepainter',
+                'frepainter': 'Frepainter',
+                'NVSR_16k': 'NVSR',
+                'NVSR': 'NVSR',
+                'VoiceFixer_16k': 'VoiceFixer',
+                'VoiceFixer': 'VoiceFixer',
+                // VCTK Noisy BWE baselines
+                'universepp': 'UNIVERSE++',
+                'StoRM': 'StoRM',
+                // VCTK-DEMAND baselines
+                'DBAIAT': 'DB-AIAT',
+                'mpsenet': 'MP-SENet',
+                'tflocoformer': 'TF-Locoformer'
+            };
+            return nameMap[baseline] || baseline;
+        }
+
+        function updateVCTKNoisyBaselines() {
+            const baselines = getVCTKNoisyBaselines(currentVCTKNoisyBWE);
+            const baselinesContainer = document.getElementById('vctk-noisy-baselines');
+            const sample = document.getElementById('vctk-noisy-sample-select').value;
+            const basePath = `samples/vctk_noisy/${currentVCTKNoisyBWE}`;
+
+            baselinesContainer.innerHTML = '';
+            baselines.forEach(baseline => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerHTML = `
+                    <h5 class="text-center">${formatBaselineName(baseline)}</h5>
+                    <audio controls style="width: 100%;">
+                        <source src="${basePath}/${baseline}/${sample}.wav">
+                    </audio>
+                `;
+                baselinesContainer.appendChild(div);
+            });
+        }
+
+        function updateVoxCelebSample() {
+            const sample = document.getElementById('voxceleb-sample-select').value;
+            const mappedSample = voxcelebMapping[sample] || sample;
+
+            document.getElementById('voxceleb-input').innerHTML =
+                `<source src="samples/voxceleb_real/input/${sample}.wav">`;
+            document.getElementById('voxceleb-ours-48k').innerHTML =
+                `<source src="samples/voxceleb_real/ours_TF_Restormer_to48k/${mappedSample}.wav">`;
+            document.getElementById('voxceleb-streaming-16k').innerHTML =
+                `<source src="samples/voxceleb_real/ours_TF_Restormer_streaming_to16k/${mappedSample}.wav">`;
+            document.getElementById('voxceleb-finally').innerHTML =
+                `<source src="samples/voxceleb_real/FINALLY/${sample}.wav">`;
+
+            document.querySelectorAll('#voxceleb-tab audio').forEach(audio => audio.load());
+        }
+
+        // Demo Sample Selection
+        function selectSample(sampleType, element) {
+            // Remove active class from all cards
+            document.querySelectorAll('.demo-card').forEach(card => {
+                card.classList.remove('active');
+            });
+
+            // Add active class to selected card
+            element.classList.add('active');
+
+            // Here you would load the appropriate audio samples
+            console.log('Selected sample:', sampleType);
+        }
+
+        // Tab Functionality
+
+        // Fade in animations on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards
+        document.querySelectorAll('.card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Initialize KaTeX rendering
+        document.addEventListener("DOMContentLoaded", function() {
+            renderMathInElement(document.body, {
+                delimiters: [
+                    {left: "$$", right: "$$", display: true},
+                    {left: "$", right: "$", display: false},
+                    {left: "\\[", right: "\\]", display: true},
+                    {left: "\\(", right: "\\)", display: false}
+                ],
+                throwOnError: false
+            });
+
+            // Initialize dynamic sample selectors
+            initializeSampleSelectors();
+
+            // Initialize default tab
+            switchTab('universe');
+        });
+    </script>
+</body>
+</html>
