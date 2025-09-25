@@ -608,41 +608,98 @@ tr:hover {
 
 /* Responsive Design */
 
+/* Responsive Grid System - Fixed for proper breakpoints */
+/* Mobile First Approach */
+
 /* Medium screens (tablets) - 768px and up */
 @media (min-width: 768px) {
-  .md\\:grid-cols-1 {
-    grid-template-columns: 1fr;
+  .md\:grid-cols-1 {
+    grid-template-columns: 1fr !important;
   }
 
-  .md\\:grid-cols-2 {
-    grid-template-columns: repeat(2, 1fr);
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 
-  .md\\:grid-cols-3 {
-    grid-template-columns: repeat(3, 1fr);
+  .md\:grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
   }
 
-  .md\\:grid-cols-4 {
-    grid-template-columns: repeat(4, 1fr);
+  .md\:grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr) !important;
   }
 }
 
 /* Large screens (desktop) - 1024px and up */
 @media (min-width: 1024px) {
-  .lg\\:grid-cols-1 {
-    grid-template-columns: 1fr;
+  .lg\:grid-cols-1 {
+    grid-template-columns: 1fr !important;
   }
 
-  .lg\\:grid-cols-2 {
-    grid-template-columns: repeat(2, 1fr);
+  .lg\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 
-  .lg\\:grid-cols-3 {
-    grid-template-columns: repeat(3, 1fr);
+  .lg\:grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
   }
 
-  .lg\\:grid-cols-4 {
-    grid-template-columns: repeat(4, 1fr);
+  .lg\:grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+/* Extra large screens (wide desktop) - 1536px and up */
+@media (min-width: 1536px) {
+  .xl\:grid-cols-1 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .xl\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .xl\:grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  .xl\:grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+
+  .xl\:grid-cols-5 {
+    grid-template-columns: repeat(5, 1fr) !important;
+  }
+
+  .xl\:grid-cols-6 {
+    grid-template-columns: repeat(6, 1fr) !important;
+  }
+}
+
+/* 2K/4K screens - 1920px and up */
+@media (min-width: 1920px) {
+  .\32xl\:grid-cols-1 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .\32xl\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .\32xl\:grid-cols-3 {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  .\32xl\:grid-cols-4 {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+
+  .\32xl\:grid-cols-5 {
+    grid-template-columns: repeat(5, 1fr) !important;
+  }
+
+  .\32xl\:grid-cols-6 {
+    grid-template-columns: repeat(6, 1fr) !important;
   }
 }
 
