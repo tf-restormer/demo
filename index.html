@@ -441,7 +441,7 @@
                     </div>
 
                     <!-- Audio Comparison Grid -->
-                    <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div class="grid grid-cols-3 gap-4 mb-4">
                         <div class="card">
                             <h4 class="text-center">Input (Low-res)</h4>
                             <img id="vctk-clean-input-spec" src="spectrograms/tab3_VCTK_C/8k_to_16k/input/p360_008_mic1.png" alt="Input Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
@@ -461,13 +461,6 @@
                             <img id="vctk-clean-clean-spec" src="spectrograms/tab3_VCTK_C/8k_to_16k/clean/p360_008_mic1.png" alt="Ground Truth Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
                             <audio id="vctk-clean-clean" controls style="width: 100%;">
                                 <source src="samples/vctk_clean/8k_to_16k/clean/p360_008_mic1.wav">
-                            </audio>
-                        </div>
-                        <div class="card">
-                            <h4 class="text-center" id="vctk-clean-baseline-title">AP-BWE</h4>
-                            <img id="vctk-clean-baseline-spec" src="spectrograms/tab3_VCTK_C/8k_to_16k/AP_BWE_16k/p360_008_mic1.png" alt="Baseline Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
-                            <audio id="vctk-clean-baseline" controls style="width: 100%;">
-                                <source src="samples/vctk_clean/8k_to_16k/AP_BWE_16k/p360_008_mic1.wav">
                             </audio>
                         </div>
                     </div>
@@ -1016,13 +1009,6 @@
             updateAudioAndSpectrogram('vctk-clean-clean', 'vctk-clean-clean-spec',
                 `${basePath}/clean/${sample}.wav`);
 
-            // Update main baseline
-            const baselines = getVCTKCleanBaselines(currentVCTKCleanBWE);
-            if (baselines.length > 0) {
-                updateAudioAndSpectrogram('vctk-clean-baseline', 'vctk-clean-baseline-spec',
-                    `${basePath}/${baselines[0]}/${sample}.wav`);
-                document.getElementById('vctk-clean-baseline-title').textContent = formatBaselineName(baselines[0]);
-            }
 
             document.querySelectorAll('#vctk_clean-tab audio').forEach(audio => audio.load());
         }
