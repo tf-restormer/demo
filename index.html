@@ -572,14 +572,21 @@
                             </audio>
                         </div>
                         <div class="card">
-                            <h4 class="text-center">TF-Restormer Streaming (Ours, 16kHz)</h4>
+                            <h4 class="text-center">TF-Restormer Streaming (48kHz)</h4>
+                            <img id="voxceleb-streaming-48k-spec" src="spectrograms/tab8_VoxCeleb_Real/ours_TF_Restormer_streaming_to48k/m80.png" alt="TF-Restormer Streaming 48kHz Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
+                            <audio id="voxceleb-streaming-48k" controls style="width: 100%;">
+                                <source src="samples/voxceleb_real/ours_TF_Restormer_streaming_to48k/m80-id10301-VIAnMw7J5tI-00010.wav">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">TF-Restormer Streaming (16kHz)</h4>
                             <img id="voxceleb-streaming-16k-spec" src="spectrograms/tab8_VoxCeleb_Real/ours_TF_Restormer_streaming_to16k/m80.png" alt="TF-Restormer Streaming 16kHz Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
                             <audio id="voxceleb-streaming-16k" controls style="width: 100%;">
                                 <source src="samples/voxceleb_real/ours_TF_Restormer_streaming_to16k/m80-id10301-VIAnMw7J5tI-00010.wav">
                             </audio>
                         </div>
                         <div class="card">
-                            <h4 class="text-center">Baseline(FINALLY)</h4>
+                            <h4 class="text-center">Baseline (FINALLY)</h4>
                             <img id="voxceleb-finally-spec" src="spectrograms/tab8_VoxCeleb_Real/FINALLY/m80.png" alt="FINALLY Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
                             <audio id="voxceleb-finally" controls style="width: 100%;">
                                 <source src="samples/voxceleb_real/FINALLY/m80.wav">
@@ -677,6 +684,7 @@
                 'input': 'm80.png',
                 'FINALLY': 'm80.png',
                 'ours_TF_Restormer_to48k': 'm80-id10301-VIAnMw7J5tI-00010.png',
+                'ours_TF_Restormer_streaming_to48k': 'm80-id10301-VIAnMw7J5tI-00010.png',
                 'ours_TF_Restormer_streaming_to16k': 'm80-id10301-VIAnMw7J5tI-00010.png',
                 'ours_TF_Restormer_to16k': 'm80-id10301-VIAnMw7J5tI-00010.png'
             },
@@ -684,6 +692,7 @@
                 'input': 'm83.png',
                 'FINALLY': 'm83.png',
                 'ours_TF_Restormer_to48k': 'm83-id10276-lWeNK_hi-aI-00002.png',
+                'ours_TF_Restormer_streaming_to48k': 'm83-id10276-lWeNK_hi-aI-00002.png',
                 'ours_TF_Restormer_streaming_to16k': 'm83-id10276-lWeNK_hi-aI-00002.png',
                 'ours_TF_Restormer_to16k': 'm83-id10276-lWeNK_hi-aI-00002.png'
             },
@@ -691,6 +700,7 @@
                 'input': 'm98.png',
                 'FINALLY': 'm98.png',
                 'ours_TF_Restormer_to48k': 'm98-id10279-PQHz4fGHPK8-00006.png',
+                'ours_TF_Restormer_streaming_to48k': 'm98-id10279-PQHz4fGHPK8-00006.png',
                 'ours_TF_Restormer_streaming_to16k': 'm98-id10279-PQHz4fGHPK8-00006.png',
                 'ours_TF_Restormer_to16k': 'm98-id10279-PQHz4fGHPK8-00006.png'
             },
@@ -698,6 +708,7 @@
                 'input': 'f81.png',
                 'FINALLY': 'f81.png',
                 'ours_TF_Restormer_to48k': 'f81-id10270-5r0dWxy17C8-00014.png',
+                'ours_TF_Restormer_streaming_to48k': 'f81-id10270-5r0dWxy17C8-00014.png',
                 'ours_TF_Restormer_streaming_to16k': 'f81-id10270-5r0dWxy17C8-00014.png',
                 'ours_TF_Restormer_to16k': 'f81-id10270-5r0dWxy17C8-00014.png'
             },
@@ -705,6 +716,7 @@
                 'input': 'f82.png',
                 'FINALLY': 'f82.png',
                 'ours_TF_Restormer_to48k': 'f82-id10308-XQWpVt5n3Ic-00010.png',
+                'ours_TF_Restormer_streaming_to48k': 'f82-id10308-XQWpVt5n3Ic-00010.png',
                 'ours_TF_Restormer_streaming_to16k': 'f82-id10308-XQWpVt5n3Ic-00010.png',
                 'ours_TF_Restormer_to16k': 'f82-id10308-XQWpVt5n3Ic-00010.png'
             }
@@ -1166,6 +1178,9 @@
 
             document.getElementById('voxceleb-ours-48k').src = `samples/voxceleb_real/ours_TF_Restormer_to48k/${mappedSample}.wav`;
             document.getElementById('voxceleb-ours-48k-spec').src = `spectrograms/tab8_VoxCeleb_Real/ours_TF_Restormer_to48k/${spectrogramPaths.ours_TF_Restormer_to48k || sample + '.png'}`;
+
+            document.getElementById('voxceleb-streaming-48k').src = `samples/voxceleb_real/ours_TF_Restormer_streaming_to48k/${mappedSample}.wav`;
+            document.getElementById('voxceleb-streaming-48k-spec').src = `spectrograms/tab8_VoxCeleb_Real/ours_TF_Restormer_streaming_to48k/${spectrogramPaths.ours_TF_Restormer_streaming_to48k || sample + '.png'}`;
 
             document.getElementById('voxceleb-streaming-16k').src = `samples/voxceleb_real/ours_TF_Restormer_streaming_to16k/${mappedSample}.wav`;
             document.getElementById('voxceleb-streaming-16k-spec').src = `spectrograms/tab8_VoxCeleb_Real/ours_TF_Restormer_streaming_to16k/${spectrogramPaths.ours_TF_Restormer_streaming_to16k || sample + '.png'}`;
