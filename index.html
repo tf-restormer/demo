@@ -332,10 +332,19 @@
                             </div>
                             <div class="card">
                                 <h5 class="text-center">FINALLY</h5>
-                                <img id="universe-baseline-finally-spec" src="spectrograms/tab1_UNIVERSE/FINALLY_16k/0015b_input.png" alt="FINALLY Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
-                                <audio id="universe-baseline-finally" controls style="width: 100%;">
-                                    <source src="samples/universe/FINALLY_16k/0015.wav">
-                                </audio>
+                                <div id="universe-baseline-finally-content">
+                                    <img id="universe-baseline-finally-spec" src="spectrograms/tab1_UNIVERSE/FINALLY_16k/0015b_input.png" alt="FINALLY Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
+                                    <audio id="universe-baseline-finally" controls style="width: 100%;">
+                                        <source src="samples/universe/FINALLY_16k/0015.wav">
+                                    </audio>
+                                </div>
+                                <div id="universe-baseline-finally-unavailable" style="display: none; padding: 40px 20px; text-align: center; color: var(--text-secondary);">
+                                    <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                                    <p style="font-size: 0.9rem;">Sample not available</p>
+                                    <p style="font-size: 0.75rem; margin-top: 5px;">
+                                        <i>FINALLY samples are from supplementary materials</i>
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </details>
@@ -936,8 +945,23 @@
                 `samples/universe/tflocoformer/${sample}b_input_enhanced.wav`);
             updateAudioAndSpectrogram('universe-baseline-voicefixer', 'universe-baseline-voicefixer-spec',
                 `samples/universe/VoiceFixer_16k/${sample}b_input.wav`);
-            updateAudioAndSpectrogram('universe-baseline-finally', 'universe-baseline-finally-spec',
-                `samples/universe/FINALLY_16k/${sample}.wav`);
+
+            // Handle FINALLY samples (only available for certain samples)
+            const finallyAvailableSamples = ['0015', '0034', '0061', '0076', '0090', '0095'];
+            const finallyContent = document.getElementById('universe-baseline-finally-content');
+            const finallyUnavailable = document.getElementById('universe-baseline-finally-unavailable');
+
+            if (finallyAvailableSamples.includes(sample)) {
+                // Sample is available
+                if (finallyContent) finallyContent.style.display = 'block';
+                if (finallyUnavailable) finallyUnavailable.style.display = 'none';
+                updateAudioAndSpectrogram('universe-baseline-finally', 'universe-baseline-finally-spec',
+                    `samples/universe/FINALLY_16k/${sample}.wav`);
+            } else {
+                // Sample is not available
+                if (finallyContent) finallyContent.style.display = 'none';
+                if (finallyUnavailable) finallyUnavailable.style.display = 'block';
+            }
 
             // Reload all audios
             document.querySelectorAll('#universe-tab audio').forEach(audio => audio.load());
