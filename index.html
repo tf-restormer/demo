@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>TF-Restormer: Time-Frequency Domain Transformer for Speech Enhancement</title>
+    <title>Query-Based Asymmetric Modeling with Decoupled Input–Output Rates for Speech Restoration</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Time-Frequency Domain Transformer for Speech Enhancement - Efficient speech enhancement using self-attention mechanisms and complex spectral mapping">
@@ -46,7 +46,7 @@
             </div>
             <h1 class="hero-title">TF-Restormer</h1>
             <p class="hero-subtitle">
-                Complex Spectral Prediction for Speech Restoration
+                Query-Based Asymmetric Modeling with Decoupled Input–Output Rates for Speech Restoration
             </p>
             <div class="hero-buttons">
                 <a href="#" class="btn btn-primary">
@@ -67,18 +67,7 @@
                 <h2 class="card-title text-center">Abstract</h2>
                 <div class="card-description">
                     <p style="text-align: justify;">
-                        Speech restoration in real-world conditions is challenging due to compounded distortions such as clipping, band-pass filtering, digital artifacts, noise, reverberation, and low sampling rates.
-                        Existing systems, including vocoder-based approaches, often sacrifice signal fidelity, while diffusion models remain impractical for streaming. Moreover, most assume a fixed target sampling rate, requiring external resampling that leads to redundant computations.
-                    </p>
-                    <p style="text-align: justify;">
-                        We present <strong>TF-Restormer</strong>, an encoder-decoder architecture that concentrates analysis on input-bandwidth with a time-frequency dual-path encoder and reconstructs missing high-frequency bands through a light decoder with frequency extension queries. It enables efficient and universal restoration across arbitrary input-output rates without redundant resampling.
-                    </p>
-                    <p style="text-align: justify;">
-                        To support adversarial training across diverse rates, we introduce a shared sampling-frequency-independent (SFI) STFT discriminator. TF-Restormer further supports streaming with a causal time module, and improves robustness under extreme degradations by injecting spectral inductive bias into the frequency module.
-                        Finally, we propose a scaled log-spectral loss that stabilizes optimization under severe conditions while emphasizing well-predicted spectral details.
-                    </p>
-                    <p style="text-align: justify;">
-                        As a single model across sampling rates, TF-Restormer consistently delivers well-balanced results in signal fidelity, semantic preservation, and perceptual quality for both offline and streaming scenarios.
+                        Speech restoration in real-world conditions is challenging due to compounded distortions and mismatches between input and desired output rates. Most existing systems assume a fixed and shared input–output rate, relying on external resampling that incurs redundant computation and limits generality. We address this setting by formulating speech restoration under decoupled input–output rates, and propose TF-Restormer, a query-based asymmetric modeling framework. The encoder concentrates analysis on the observed input bandwidth using a time–frequency dual-path architecture, while a lightweight decoder reconstructs missing spectral content via frequency extension queries. This design enables a single model to operate consistently across arbitrary input–output rate pairs without redundant resampling. Experiments across diverse sampling rates, degradations, and operating modes show that TF-Restormer maintains stable restoration behavior and balanced perceptual quality, including in real-time streaming scenarios.
                     </p>
                 </div>
             </div>
