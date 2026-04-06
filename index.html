@@ -231,6 +231,12 @@
                     <button class="tab-header" onclick="switchTab('voxceleb')">
                         <i class="fas fa-users"></i> VoxCeleb Real
                     </button>
+                    <button class="tab-header" onclick="switchTab('reverb')">
+                        <i class="fas fa-building"></i> REVERB
+                    </button>
+                    <button class="tab-header" onclick="switchTab('reverb_dns')">
+                        <i class="fas fa-smog"></i> REVERB-DNS (Hard)
+                    </button>
                 </div>
 
                 <!-- UNIVERSE Dataset Tab -->
@@ -585,6 +591,118 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- REVERB Tab -->
+                <div id="reverb-tab" class="tab-content" style="display: none;">
+                    <h3>REVERB Challenge (Dereverberation)</h3>
+                    <p>Dereverberation results on REVERB Challenge SimData (eval test set):</p>
+
+                    <!-- Distance Selector -->
+                    <div class="sample-selector mb-4">
+                        <label><strong>Select Case: </strong></label>
+                        <select id="reverb-case-select" onchange="updateReverbCase()" class="form-select">
+                            <option value="near">Near (Low Reverb)</option>
+                            <option value="far">Far (High Reverb)</option>
+                        </select>
+                    </div>
+
+                    <!-- Sample Selector -->
+                    <div class="sample-selector mb-4">
+                        <label><strong>Select Sample: </strong></label>
+                        <select id="reverb-sample-select" onchange="updateReverbSample()" class="form-select">
+                        </select>
+                    </div>
+
+                    <!-- Audio Comparison Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                        <div class="card">
+                            <h4 class="text-center">Input (Reverberant)</h4>
+                            <img id="reverb-input-spec" src="" alt="Input Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
+                            <audio id="reverb-input" controls style="width: 100%;">
+                                <source src="">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">TF-Restormer (Ours)</h4>
+                            <img id="reverb-ours-spec" src="" alt="TF-Restormer Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
+                            <audio id="reverb-ours" controls style="width: 100%;">
+                                <source src="">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">Ground Truth (Clean)</h4>
+                            <img id="reverb-clean-spec" src="" alt="Clean Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
+                            <audio id="reverb-clean" controls style="width: 100%;">
+                                <source src="">
+                            </audio>
+                        </div>
+                    </div>
+
+                    <!-- Baseline Models -->
+                    <details class="baseline-models mt-4" open>
+                        <summary class="btn btn-secondary" style="cursor: pointer;">
+                            <i class="fas fa-chart-line"></i> Compare with Baseline Models
+                        </summary>
+                        <div id="reverb-baselines" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
+                        </div>
+                    </details>
+                </div>
+
+                <!-- REVERB-DNS (Hard) Tab -->
+                <div id="reverb_dns-tab" class="tab-content" style="display: none;">
+                    <h3>REVERB-DNS (Hard) — Joint Dereverberation &amp; Denoising</h3>
+                    <p>Joint dereverberation and denoising on REVERB Challenge SimData with additive noise:</p>
+
+                    <!-- Distance Selector -->
+                    <div class="sample-selector mb-4">
+                        <label><strong>Select Case: </strong></label>
+                        <select id="reverb-dns-case-select" onchange="updateReverbDNSCase()" class="form-select">
+                            <option value="near">Near (Low Reverb + Noise)</option>
+                            <option value="far">Far (High Reverb + Noise)</option>
+                        </select>
+                    </div>
+
+                    <!-- Sample Selector -->
+                    <div class="sample-selector mb-4">
+                        <label><strong>Select Sample: </strong></label>
+                        <select id="reverb-dns-sample-select" onchange="updateReverbDNSSample()" class="form-select">
+                        </select>
+                    </div>
+
+                    <!-- Audio Comparison Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+                        <div class="card">
+                            <h4 class="text-center">Input (Reverberant + Noisy)</h4>
+                            <img id="reverb-dns-input-spec" src="" alt="Input Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
+                            <audio id="reverb-dns-input" controls style="width: 100%;">
+                                <source src="">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">TF-Restormer (Ours)</h4>
+                            <img id="reverb-dns-ours-spec" src="" alt="TF-Restormer Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
+                            <audio id="reverb-dns-ours" controls style="width: 100%;">
+                                <source src="">
+                            </audio>
+                        </div>
+                        <div class="card">
+                            <h4 class="text-center">Ground Truth (Clean)</h4>
+                            <img id="reverb-dns-clean-spec" src="" alt="Clean Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
+                            <audio id="reverb-dns-clean" controls style="width: 100%;">
+                                <source src="">
+                            </audio>
+                        </div>
+                    </div>
+
+                    <!-- Baseline Models -->
+                    <details class="baseline-models mt-4" open>
+                        <summary class="btn btn-secondary" style="cursor: pointer;">
+                            <i class="fas fa-chart-line"></i> Compare with Baseline Models
+                        </summary>
+                        <div id="reverb-dns-baselines" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 mt-3">
+                        </div>
+                    </details>
+                </div>
             </div>
 
             <!-- More Examples (Keeping for backwards compatibility) -->
@@ -711,7 +829,9 @@
                 'samples/vctk_demand/': 'spectrograms/tab2_VCTK_DEMAND/',
                 'samples/vctk_clean/': 'spectrograms/tab3_VCTK_C/',
                 'samples/vctk_noisy/': 'spectrograms/tab3_VCTK_ND/',
-                'samples/voxceleb_real/': 'spectrograms/tab8_VoxCeleb_Real/'
+                'samples/voxceleb_real/': 'spectrograms/tab8_VoxCeleb_Real/',
+                'samples/reverb_et/': 'spectrograms/tab_REVERB_et/',
+                'samples/reverb_dns_et/': 'spectrograms/tab_REVERB_DNS_et/'
             };
 
             let spectrogramPath = audioPath.replace('.wav', '.png');
@@ -906,6 +1026,10 @@
                 updateVCTKNoisyBWE();
             } else if (tabName === 'voxceleb') {
                 updateVoxCelebSample();
+            } else if (tabName === 'reverb') {
+                updateReverbCase();
+            } else if (tabName === 'reverb_dns') {
+                updateReverbDNSCase();
             }
         }
 
@@ -1117,6 +1241,126 @@
             return baselineMap[bweCase] || [];
         }
 
+        // ── REVERB Tab Functions ──
+        let currentReverbCase = 'near';
+        const reverbSamplesByCase = {
+            'near': ['c30_c30c0202_ch1', 'c30_c30c0207_ch1', 'c30_c30c0208_ch1', 'c30_c30c0209_ch1', 'c30_c30c020f_ch1', 'c30_c30c020g_ch1', 'c30_c30c020i_ch1', 'c30_c30c0215_ch1', 'c32_c32c0202_ch1', 'c32_c32c0203_ch1', 'c32_c32c0206_ch1', 'c32_c32c020e_ch1', 'c32_c32c0214_ch1', 'c3o_c3oc020i_ch1', 'c3q_c3qc020b_ch1', 'c3r_c3rc020i_ch1', 'c3y_c3yc0204_ch1', 'c3y_c3yc020l_ch1', 'c46_c46c020e_ch1', 'c4a_c4ac0204_ch1'],
+            'far': ['c30_c30c0202_ch1', 'c30_c30c0207_ch1', 'c30_c30c0208_ch1', 'c30_c30c0209_ch1', 'c30_c30c020f_ch1', 'c30_c30c020g_ch1', 'c30_c30c020i_ch1', 'c30_c30c0215_ch1', 'c32_c32c0202_ch1', 'c32_c32c0203_ch1', 'c39_c39c0206_ch1', 'c3q_c3qc020b_ch1', 'c3q_c3qc020o_ch1', 'c3q_c3qc0212_ch1', 'c3y_c3yc020l_ch1', 'c46_c46c020e_ch1', 'c46_c46c0211_ch1', 'c4a_c4ac0206_ch1', 'c4a_c4ac0209_ch1', 'c4a_c4ac020x_ch1']
+        };
+
+        function updateReverbCase() {
+            currentReverbCase = document.getElementById('reverb-case-select').value;
+            const samples = reverbSamplesByCase[currentReverbCase] || [];
+            const sampleSelect = document.getElementById('reverb-sample-select');
+            sampleSelect.innerHTML = '';
+            samples.forEach((sample, index) => {
+                const option = document.createElement('option');
+                option.value = sample;
+                option.text = sample;
+                if (index === 0) option.selected = true;
+                sampleSelect.appendChild(option);
+            });
+            updateReverbSample();
+            updateReverbBaselines();
+        }
+
+        function updateReverbSample() {
+            const sample = document.getElementById('reverb-sample-select').value;
+            const basePath = `samples/reverb_et/${currentReverbCase}`;
+
+            updateAudioAndSpectrogram('reverb-input', 'reverb-input-spec',
+                `${basePath}/input/${sample}.wav`);
+            updateAudioAndSpectrogram('reverb-ours', 'reverb-ours-spec',
+                `${basePath}/TF_Restormer/${sample}.wav`);
+            updateAudioAndSpectrogram('reverb-clean', 'reverb-clean-spec',
+                `${basePath}/clean/${sample}.wav`);
+
+            updateReverbBaselines();
+            document.querySelectorAll('#reverb-tab audio').forEach(audio => audio.load());
+        }
+
+        function updateReverbBaselines() {
+            const baselines = ['TF_GridNet', 'MP_SENet', 'TF_Locoformer', 'UNIVERSE_pp', 'VoiceFixer'];
+            const baselinesContainer = document.getElementById('reverb-baselines');
+            const sample = document.getElementById('reverb-sample-select').value;
+            const basePath = `samples/reverb_et/${currentReverbCase}`;
+
+            baselinesContainer.innerHTML = '';
+            baselines.forEach(baseline => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                const audioPath = `${basePath}/${baseline}/${sample}.wav`;
+                div.innerHTML = `
+                    <h5 class="text-center">${formatBaselineName(baseline)}</h5>
+                    <img src="${audioToSpectrogramPath(audioPath)}" alt="${formatBaselineName(baseline)} Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
+                    <audio controls style="width: 100%;">
+                        <source src="${audioPath}">
+                    </audio>
+                `;
+                baselinesContainer.appendChild(div);
+            });
+        }
+
+        // ── REVERB-DNS Tab Functions ──
+        let currentReverbDNSCase = 'near';
+        const reverbDNSSamplesByCase = {
+            'near': ['c30_c30c0202_ch1', 'c30_c30c0207_ch1', 'c30_c30c0208_ch1', 'c30_c30c0209_ch1', 'c30_c30c020f_ch1', 'c30_c30c020g_ch1', 'c30_c30c020i_ch1', 'c30_c30c0215_ch1', 'c32_c32c0202_ch1', 'c32_c32c0203_ch1', 'c32_c32c0206_ch1', 'c33_c33c020f_ch1', 'c33_c33c020r_ch1', 'c3q_c3qc020i_ch1', 'c3q_c3qc020o_ch1', 'c3r_c3rc020i_ch1', 'c3y_c3yc0212_ch1', 'c46_c46c020e_ch1', 'c46_c46c0211_ch1', 'c48_c48c0209_ch1'],
+            'far': ['c30_c30c0202_ch1', 'c30_c30c0207_ch1', 'c30_c30c0208_ch1', 'c30_c30c0209_ch1', 'c30_c30c020f_ch1', 'c30_c30c020g_ch1', 'c30_c30c020i_ch1', 'c30_c30c0215_ch1', 'c32_c32c0202_ch1', 'c32_c32c0203_ch1', 'c32_c32c0206_ch1', 'c32_c32c020e_ch1', 'c37_c37c020m_ch1', 'c37_c37c0212_ch1', 'c3b_c3bc020n_ch1', 'c3q_c3qc020i_ch1', 'c3y_c3yc0213_ch1', 'c48_c48c0209_ch1', 'c4a_c4ac0209_ch1', 'c4a_c4ac020o_ch1']
+        };
+
+        function updateReverbDNSCase() {
+            currentReverbDNSCase = document.getElementById('reverb-dns-case-select').value;
+            const samples = reverbDNSSamplesByCase[currentReverbDNSCase] || [];
+            const sampleSelect = document.getElementById('reverb-dns-sample-select');
+            sampleSelect.innerHTML = '';
+            samples.forEach((sample, index) => {
+                const option = document.createElement('option');
+                option.value = sample;
+                option.text = sample;
+                if (index === 0) option.selected = true;
+                sampleSelect.appendChild(option);
+            });
+            updateReverbDNSSample();
+            updateReverbDNSBaselines();
+        }
+
+        function updateReverbDNSSample() {
+            const sample = document.getElementById('reverb-dns-sample-select').value;
+            const basePath = `samples/reverb_dns_et/${currentReverbDNSCase}`;
+
+            updateAudioAndSpectrogram('reverb-dns-input', 'reverb-dns-input-spec',
+                `${basePath}/input/${sample}.wav`);
+            updateAudioAndSpectrogram('reverb-dns-ours', 'reverb-dns-ours-spec',
+                `${basePath}/TF_Restormer/${sample}.wav`);
+            updateAudioAndSpectrogram('reverb-dns-clean', 'reverb-dns-clean-spec',
+                `${basePath}/clean/${sample}.wav`);
+
+            updateReverbDNSBaselines();
+            document.querySelectorAll('#reverb_dns-tab audio').forEach(audio => audio.load());
+        }
+
+        function updateReverbDNSBaselines() {
+            const baselines = ['TF_GridNet', 'MP_SENet', 'TF_Locoformer', 'UNIVERSE_pp', 'VoiceFixer'];
+            const baselinesContainer = document.getElementById('reverb-dns-baselines');
+            const sample = document.getElementById('reverb-dns-sample-select').value;
+            const basePath = `samples/reverb_dns_et/${currentReverbDNSCase}`;
+
+            baselinesContainer.innerHTML = '';
+            baselines.forEach(baseline => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                const audioPath = `${basePath}/${baseline}/${sample}.wav`;
+                div.innerHTML = `
+                    <h5 class="text-center">${formatBaselineName(baseline)}</h5>
+                    <img src="${audioToSpectrogramPath(audioPath)}" alt="${formatBaselineName(baseline)} Spectrogram" class="spectrogram-image" style="width: 100%; height: auto; margin-bottom: 10px; border-radius: 5px;">
+                    <audio controls style="width: 100%;">
+                        <source src="${audioPath}">
+                    </audio>
+                `;
+                baselinesContainer.appendChild(div);
+            });
+        }
+
         function formatBaselineName(baseline) {
             const nameMap = {
                 // VCTK Clean BWE baselines
@@ -1136,7 +1380,12 @@
                 // VCTK-DEMAND baselines
                 'DBAIAT': 'DB-AIAT',
                 'mpsenet': 'MP-SENet',
-                'tflocoformer': 'TF-Locoformer'
+                'tflocoformer': 'TF-Locoformer',
+                // REVERB baselines
+                'TF_GridNet': 'TF-GridNet',
+                'MP_SENet': 'MP-SENet',
+                'TF_Locoformer': 'TF-Locoformer',
+                'UNIVERSE_pp': 'UNIVERSE++'
             };
             return nameMap[baseline] || baseline;
         }
