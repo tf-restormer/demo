@@ -1147,7 +1147,7 @@
             updateAudioAndSpectrogram('vctk-clean-clean', 'vctk-clean-clean-spec',
                 `${basePath}/clean/${sample}.wav`);
 
-
+            updateVCTKCleanBaselines();
             document.querySelectorAll('#vctk_clean-tab audio').forEach(audio => audio.load());
         }
 
@@ -1229,6 +1229,7 @@
             updateAudioAndSpectrogram('vctk-noisy-clean', 'vctk-noisy-clean-spec',
                 `${basePath}/clean/${sample}.wav`);
 
+            updateVCTKNoisyBaselines();
             document.querySelectorAll('#vctk_noisy-tab audio').forEach(audio => audio.load());
         }
 
