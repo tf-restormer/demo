@@ -195,6 +195,28 @@ body {
   color: var(--text-accent);
 }
 
+/* Mobile Nav Toggle (hamburger) - hidden on desktop by default */
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-xl);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.nav-toggle:hover,
+.nav-toggle:focus-visible {
+  background-color: var(--bg-hover);
+}
+
 /* Theme Toggle Switch */
 .theme-toggle {
   position: relative;
@@ -490,6 +512,13 @@ tr:hover {
   background: var(--bg-hover);
 }
 
+/* KaTeX Math Overflow - long display equations scroll horizontally on their
+   own instead of forcing the whole page width (applies at all breakpoints) */
+.katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 /* Comparison Slider */
 .comparison-container {
   position: relative;
@@ -719,8 +748,38 @@ tr:hover {
     grid-template-columns: 1fr;
   }
 
+  .nav-toggle {
+    display: inline-flex;
+  }
+
   .nav {
-    gap: var(--space-md);
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: var(--shadow-md);
+  }
+
+  .nav.is-open {
+    display: flex;
+  }
+
+  .nav-link {
+    display: block;
+    padding: var(--space-md) var(--space-sm);
+    border-radius: var(--radius-md);
+  }
+
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    background-color: var(--bg-hover);
   }
 
   .container {
@@ -733,6 +792,29 @@ tr:hover {
 
   .card {
     padding: var(--space-xl);
+  }
+
+  /* Dataset tabs: horizontal scroll instead of wrapping/forcing page width */
+  .tab-headers {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .tab-headers::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  .tab-headers::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: var(--radius-full);
+  }
+
+  .tab-header {
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: var(--space-lg) var(--space-lg);
   }
 }
 

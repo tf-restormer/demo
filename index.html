@@ -21,7 +21,10 @@
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <div class="nav">
+                <button type="button" class="nav-toggle" id="navToggle" aria-label="메뉴 열기" aria-expanded="false" aria-controls="primaryNav">
+                    <i class="fas fa-bars" aria-hidden="true"></i>
+                </button>
+                <div class="nav" id="primaryNav">
                     <a href="#" class="nav-link">Home</a>
                     <a href="#architecture" class="nav-link">Abstract & Architecture</a>
                     <a href="#demo" class="nav-link">Audio Samples</a>
@@ -954,6 +957,28 @@
         if (savedTheme === 'dark') {
             themeIcon.textContent = '🌙';
             themeToggle.classList.add('dark');
+        }
+
+        // Mobile Nav Toggle (hamburger menu)
+        const navToggle = document.getElementById('navToggle');
+        const primaryNav = document.getElementById('primaryNav');
+
+        function setNavOpen(isOpen) {
+            primaryNav.classList.toggle('is-open', isOpen);
+            navToggle.setAttribute('aria-expanded', String(isOpen));
+            navToggle.setAttribute('aria-label', isOpen ? '메뉴 닫기' : '메뉴 열기');
+            navToggle.querySelector('i').className = isOpen ? 'fas fa-times' : 'fas fa-bars';
+        }
+
+        if (navToggle && primaryNav) {
+            navToggle.addEventListener('click', () => {
+                setNavOpen(!primaryNav.classList.contains('is-open'));
+            });
+
+            // Close the dropdown after navigating to a section
+            primaryNav.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', () => setNavOpen(false));
+            });
         }
 
         // Smooth Scroll for Navigation
